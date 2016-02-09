@@ -71,8 +71,10 @@ public class Converter
                         {
                             MutableList<String> allLines = ListAdapter.adapt(Files.readAllLines(file, Charset.defaultCharset()));
                             MutableList<String> replacedLines = allLines.collect(Converter::replaceMatching);
-
-                            Files.write(file, replacedLines);
+                            if(!replacedLines.equals(allLines))
+                            {
+                                Files.write(file, replacedLines);
+                            }
                         }
                         catch (MalformedInputException e)
                         {
