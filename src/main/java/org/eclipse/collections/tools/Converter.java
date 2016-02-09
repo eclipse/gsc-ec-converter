@@ -12,6 +12,7 @@ package org.eclipse.collections.tools;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -72,6 +73,10 @@ public class Converter
                             MutableList<String> replacedLines = allLines.collect(Converter::replaceMatching);
 
                             Files.write(file, replacedLines);
+                        }
+                        catch (MalformedInputException e)
+                        {
+                            System.out.println("Ignoring non-text file: " + file.toAbsolutePath().toString() + ". ");
                         }
                         catch (IOException e)
                         {
