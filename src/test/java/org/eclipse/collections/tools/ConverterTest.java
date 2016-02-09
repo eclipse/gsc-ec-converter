@@ -45,6 +45,12 @@ public class ConverterTest
         MutableList<String> javaFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/src/main/java/TestClass.java")));
         Assert.assertEquals(0, javaFile.countWith(String::contains, "com.gs"));
         Assert.assertEquals(2, javaFile.countWith(String::contains, "org.eclipse"));
+
+        MutableList<String> ignoredFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/.ignored/should_not_be_read.gradle")));
+        Assert.assertEquals(3, ignoredFile.countWith(String::contains, "com.goldmansachs"));
+        Assert.assertEquals(3, ignoredFile.countWith(String::contains, "gs-collections"));
+        Assert.assertEquals(0, ignoredFile.countWith(String::contains, "org.eclipse.collections"));
+        Assert.assertEquals(0, ignoredFile.countWith(String::contains, "eclipse-collections"));
     }
 
     @Test

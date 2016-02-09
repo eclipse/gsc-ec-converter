@@ -30,3 +30,11 @@ dependencies {
 }
 
 mainClassName = "org.eclipse.collections.tools.Converter"
+
+// gradlew run -Pargs="path/to/project"
+run {
+  if (project.hasProperty('args'))
+  {
+    args project.args.split('\\s+')
+  }
+}

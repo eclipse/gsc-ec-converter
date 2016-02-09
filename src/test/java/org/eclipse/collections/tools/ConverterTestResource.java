@@ -58,7 +58,7 @@ public class ConverterTestResource extends ExternalResource
         Files.walk(src).forEach(path -> {
             if (path.getNameCount() > src.getNameCount())
             {
-                String relativePath = IntInterval.fromTo(src.getNameCount(), path.getNameCount()-1)
+                String relativePath = IntInterval.fromTo(src.getNameCount(), path.getNameCount() - 1)
                         .collect(count -> path.getName(count).toString())
                         .makeString("/");
                 Path target = dist.resolve(Paths.get(relativePath));

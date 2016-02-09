@@ -11,6 +11,7 @@
 package org.eclipse.collections.tools;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
@@ -21,11 +22,14 @@ import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.list.mutable.ListAdapter;
+import org.eclipse.collections.impl.list.primitive.IntInterval;
 
 public class Converter
 {
     private static ImmutableMap<String, String> CONVERSION_MAP;
-    static{
+
+    static
+    {
         MutableMap<String, String> conversionMap = Maps.mutable.empty();
         conversionMap.put("com\\.gs", "org\\.eclipse");
         conversionMap.put("com\\.goldmansachs", "org\\.eclipse\\.collections");
@@ -35,13 +39,13 @@ public class Converter
 
     public static void main(String[] args)
     {
-        if(args.length != 1)
+        if (args.length != 1)
         {
             System.out.println("Usage: gsc-ec-converter <PATH_TO_PROJECT>");
             System.exit(1);
         }
         String path = args[0];
-        if(Files.exists(Paths.get(path)))
+        if (Files.exists(Paths.get(path)))
         {
             System.out.println("Running Eclipse Collections Converter against " + path + ".");
             convert(path);
@@ -58,19 +62,22 @@ public class Converter
     {
         try
         {
-            Files.walk(Paths.get(path)).filter(Files::isRegularFile).forEach(file -> {
-                try
-                {
-                    MutableList<String> allLines = ListAdapter.adapt(Files.readAllLines(file));
-                    MutableList<String> replacedLines = allLines.collect(Converter::replaceMatching);
+            Files.walk(Paths.get(path))
+                    .filter(Files::isRegularFile)
+                    .filter(file -> IntInterval.fromTo(0, file.getNameCount() - 1).collect(file::getName).noneSatisfy(s -> s.toString().startsWith(".")))
+                    .forEach(file -> {
+                        try
+                        {
+                            MutableList<String> allLines = ListAdapter.adapt(Files.readAllLines(file, Charset.defaultCharset()));
+                            MutableList<String> replacedLines = allLines.collect(Converter::replaceMatching);
 
-                    Files.write(file, replacedLines);
-                }
-                catch (IOException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            });
+                            Files.write(file, replacedLines);
+                        }
+                        catch (IOException e)
+                        {
+                            throw new RuntimeException("A problem occurred in file: " + file, e);
+                        }
+                    });
         }
         catch (IOException e)
         {
@@ -88,5 +95,4 @@ public class Converter
         });
         return temp[0];
     }
-
 }
