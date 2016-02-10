@@ -12,21 +12,22 @@ package org.eclipse.collections.tools;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
-import org.eclipse.collections.impl.list.mutable.ListAdapter;
-import org.eclipse.collections.impl.list.primitive.IntInterval;
 
 public class Converter
 {
+    private static ImmutableList<String> FILE_SCOPE = Lists.immutable.of(".java", ".xml", "gradle");
     private static ImmutableMap<String, String> CONVERSION_MAP;
 
     static
@@ -65,20 +66,21 @@ public class Converter
         {
             Files.walk(Paths.get(path))
                     .filter(Files::isRegularFile)
-                    .filter(file -> IntInterval.fromTo(0, file.getNameCount() - 1).collect(file::getName).noneSatisfy(s -> s.toString().startsWith(".")))
+                    .filter(file -> FILE_SCOPE.anySatisfy(suffix ->  file.getFileName().toString().endsWith(suffix)))
                     .forEach(file -> {
                         try
                         {
-                            MutableList<String> allLines = ListAdapter.adapt(Files.readAllLines(file, Charset.defaultCharset()));
-                            MutableList<String> replacedLines = allLines.collect(Converter::replaceMatching);
-                            if(!replacedLines.equals(allLines))
+                            final boolean[] fileChanged = {false};
+                            List<String> replacedLines = Files.lines(file, Charset.defaultCharset()).map(line -> {
+                                String newLine = replaceMatching(line);
+                                fileChanged[0] = fileChanged[0] || !newLine.equals(line);
+                                return newLine;
+                            }).collect(Collectors.toList());
+
+                            if(fileChanged[0])
                             {
                                 Files.write(file, replacedLines);
                             }
-                        }
-                        catch (MalformedInputException e)
-                        {
-                            System.out.println("Ignoring non-text file: " + file.toAbsolutePath().toString() + ". ");
                         }
                         catch (IOException e)
                         {

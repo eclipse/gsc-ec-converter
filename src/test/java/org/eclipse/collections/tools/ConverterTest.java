@@ -11,7 +11,9 @@
 package org.eclipse.collections.tools;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
 
 import org.eclipse.collections.api.list.MutableList;
@@ -28,6 +30,9 @@ public class ConverterTest
     @Test
     public void main() throws Exception
     {
+        Path no_updateFile = Paths.get(ConverterTestResource.TEST_DIR + "/pom_no_update.xml");
+        FileTime lastModifiedTimeControl = Files.getLastModifiedTime(no_updateFile);
+
         Converter.main(new String[]{ConverterTestResource.TEST_DIR});
 
         MutableList<String> gradleFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/build.gradle")));
@@ -46,11 +51,14 @@ public class ConverterTest
         Assert.assertEquals(0, javaFile.countWith(String::contains, "com.gs"));
         Assert.assertEquals(2, javaFile.countWith(String::contains, "org.eclipse"));
 
-        MutableList<String> ignoredFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/.ignored/should_not_be_read.gradle")));
+        MutableList<String> ignoredFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/.ignored/should_not_be_read")));
         Assert.assertEquals(3, ignoredFile.countWith(String::contains, "com.goldmansachs"));
         Assert.assertEquals(3, ignoredFile.countWith(String::contains, "gs-collections"));
         Assert.assertEquals(0, ignoredFile.countWith(String::contains, "org.eclipse.collections"));
         Assert.assertEquals(0, ignoredFile.countWith(String::contains, "eclipse-collections"));
+
+        FileTime lastModifiedTime = Files.getLastModifiedTime(no_updateFile);
+        Assert.assertEquals(lastModifiedTimeControl, lastModifiedTime);
     }
 
     @Test
