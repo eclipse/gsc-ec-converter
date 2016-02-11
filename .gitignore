@@ -3,4 +3,3 @@ build
 gradle.prefs
 .idea/workspace.xml
 .idea/uiDesigner.xml
-src/test/resources/test

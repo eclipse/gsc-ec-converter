@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 public class ConverterTestResource extends ExternalResource
 {
     public static final String RESOURCE_DIR = "src/test/resources/source";
-    public static final String TEST_DIR = "src/test/resources/test";
+    public static final String TEST_DIR = System.getProperty("java.io.tmpdir") + "gsc_ec_converter_test";
     private ExitMock exitMock = ExitMock.getInstance();
 
     @Override
@@ -94,7 +94,7 @@ public class ConverterTestResource extends ExternalResource
                 catch (IOException e)
                 {
                     throw new RuntimeException("Resources may not have been cleaned-up... " +
-                            "Manually delete files under \"src/test/resources/test\" and rerun", e);
+                            "Manually delete files under " + TEST_DIR + " and rerun", e);
                 }
             });
             Files.delete(path);
