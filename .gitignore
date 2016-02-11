@@ -1,0 +1,5 @@
+build
+.gradle
+gradle.prefs
+.idea/workspace.xml
+.idea/uiDesigner.xml
