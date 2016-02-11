@@ -7,10 +7,8 @@
  * and the Eclipse Distribution License is available at
  * http://www.eclipse.org/org/documents/edl-v10.php.
  */
-package org.eclipse.collections.tools;
 
-import org.eclipse.collections.impl.list.primitive.IntInterval;
-import org.junit.rules.ExternalResource;
+package org.eclipse.collections.tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,11 +16,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.eclipse.collections.impl.list.primitive.IntInterval;
+import org.junit.rules.ExternalResource;
+
 public class ConverterTestResource extends ExternalResource
 {
     public static final String RESOURCE_DIR = "src/test/resources/source";
     public static final String TEST_DIR = System.getProperty("java.io.tmpdir") + "gsc_ec_converter_test";
-    private ExitMock exitMock = ExitMock.getInstance();
+    private final ExitMock exitMock = ExitMock.getInstance();
 
     @Override
     protected void before() throws Throwable
@@ -47,8 +48,8 @@ public class ConverterTestResource extends ExternalResource
 
     private void copyFilesToTestDir() throws IOException
     {
-        final Path src = new File(RESOURCE_DIR).toPath();
-        final Path dist = new File(TEST_DIR).toPath();
+        Path src = new File(RESOURCE_DIR).toPath();
+        Path dist = new File(TEST_DIR).toPath();
 
         if (!Files.exists(dist))
         {
@@ -89,7 +90,7 @@ public class ConverterTestResource extends ExternalResource
             Files.list(path).forEach(eachPath -> {
                 try
                 {
-                    clean(eachPath);
+                    this.clean(eachPath);
                 }
                 catch (IOException e)
                 {

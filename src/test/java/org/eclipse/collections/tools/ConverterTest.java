@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
-import java.util.List;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.ListAdapter;
@@ -33,7 +32,7 @@ public class ConverterTest
         Path no_updateFile = Paths.get(ConverterTestResource.TEST_DIR + "/pom_no_update.xml");
         FileTime lastModifiedTimeControl = Files.getLastModifiedTime(no_updateFile);
 
-        Converter.main(new String[]{ConverterTestResource.TEST_DIR});
+        Converter.main(ConverterTestResource.TEST_DIR);
 
         MutableList<String> gradleFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/build.gradle")));
         Assert.assertEquals(0, gradleFile.countWith(String::contains, "com.goldmansachs"));
@@ -66,7 +65,7 @@ public class ConverterTest
     {
         try
         {
-            Converter.main(new String[]{});
+            Converter.main();
             Assert.fail("Converter should fail for 0 argument");
         }
         catch (RuntimeException e)
@@ -80,7 +79,7 @@ public class ConverterTest
     {
         try
         {
-            Converter.main(new String[]{"nonExistingPath"});
+            Converter.main("nonExistingPath");
             Assert.fail("Converter should fail for invalid path argument");
         }
         catch (RuntimeException e)
