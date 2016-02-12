@@ -16,11 +16,10 @@ public class ExitMock extends SecurityManager
 {
     private static final ExitMock INSTANCE = new ExitMock();
     private static final SecurityManager SECURITY_MANAGER = System.getSecurityManager();
-    private int status = 0;
+    private int status;
 
     private ExitMock()
     {
-
     }
 
     public static ExitMock getInstance()

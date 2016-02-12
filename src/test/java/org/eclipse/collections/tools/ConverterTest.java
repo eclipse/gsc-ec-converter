@@ -10,54 +10,70 @@
 
 package org.eclipse.collections.tools;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
-import java.util.List;
 
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.mutable.ListAdapter;
+import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class ConverterTest
 {
-    @Rule
-    public ConverterTestResource testResource = new ConverterTestResource();
+    public static final String RESOURCE_DIR = "src/test/resources/source";
 
+    @Rule
+    public NoSystemExitRule testResource = new NoSystemExitRule();
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private File testDir;
+
+    @Before
+    public void setUp() throws IOException
+    {
+        this.testDir = this.temporaryFolder.newFolder();
+        this.copyFilesToTestDir();
+    }
     @Test
     public void main() throws Exception
     {
-        Path no_updateFile = Paths.get(ConverterTestResource.TEST_DIR + "/pom_no_update.xml");
-        FileTime lastModifiedTimeControl = Files.getLastModifiedTime(no_updateFile);
+        Path noUpdateFile = Paths.get(this.testDir + "/pom_no_update.xml");
+        FileTime lastModifiedTimeControl = Files.getLastModifiedTime(noUpdateFile);
 
-        Converter.main(new String[]{ConverterTestResource.TEST_DIR});
+        Converter.main(this.testDir.getAbsolutePath());
 
-        MutableList<String> gradleFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/build.gradle")));
+        MutableList<String> gradleFile = ListAdapter.adapt(Files.readAllLines(Paths.get(this.testDir + "/build.gradle")));
         Assert.assertEquals(0, gradleFile.countWith(String::contains, "com.goldmansachs"));
         Assert.assertEquals(0, gradleFile.countWith(String::contains, "gs-collections"));
         Assert.assertEquals(3, gradleFile.countWith(String::contains, "org.eclipse.collections"));
         Assert.assertEquals(3, gradleFile.countWith(String::contains, "eclipse-collections"));
 
-        MutableList<String> pomFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/pom.xml")));
+        MutableList<String> pomFile = ListAdapter.adapt(Files.readAllLines(Paths.get(this.testDir + "/pom.xml")));
         Assert.assertEquals(0, pomFile.countWith(String::contains, "com.goldmansachs"));
         Assert.assertEquals(0, pomFile.countWith(String::contains, "gs-collections"));
         Assert.assertEquals(3, pomFile.countWith(String::contains, "org.eclipse.collections"));
         Assert.assertEquals(3, pomFile.countWith(String::contains, "eclipse-collections"));
 
-        MutableList<String> javaFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/src/main/java/TestClass.java")));
+        MutableList<String> javaFile = ListAdapter.adapt(Files.readAllLines(Paths.get(this.testDir + "/src/main/java/TestClass.java")));
         Assert.assertEquals(0, javaFile.countWith(String::contains, "com.gs"));
         Assert.assertEquals(2, javaFile.countWith(String::contains, "org.eclipse"));
 
-        MutableList<String> ignoredFile = ListAdapter.adapt(Files.readAllLines(Paths.get(ConverterTestResource.TEST_DIR + "/.ignored/should_not_be_read")));
+        MutableList<String> ignoredFile = ListAdapter.adapt(Files.readAllLines(Paths.get(this.testDir + "/.ignored/should_not_be_read")));
         Assert.assertEquals(3, ignoredFile.countWith(String::contains, "com.goldmansachs"));
         Assert.assertEquals(3, ignoredFile.countWith(String::contains, "gs-collections"));
         Assert.assertEquals(0, ignoredFile.countWith(String::contains, "org.eclipse.collections"));
         Assert.assertEquals(0, ignoredFile.countWith(String::contains, "eclipse-collections"));
 
-        FileTime lastModifiedTime = Files.getLastModifiedTime(no_updateFile);
+        FileTime lastModifiedTime = Files.getLastModifiedTime(noUpdateFile);
         Assert.assertEquals(lastModifiedTimeControl, lastModifiedTime);
     }
 
@@ -66,7 +82,7 @@ public class ConverterTest
     {
         try
         {
-            Converter.main(new String[]{});
+            Converter.main();
             Assert.fail("Converter should fail for 0 argument");
         }
         catch (RuntimeException e)
@@ -80,12 +96,41 @@ public class ConverterTest
     {
         try
         {
-            Converter.main(new String[]{"nonExistingPath"});
+            Converter.main("nonExistingPath");
             Assert.fail("Converter should fail for invalid path argument");
         }
         catch (RuntimeException e)
         {
             Assert.assertEquals(1, ExitMock.getInstance().getStatus());
         }
+    }
+
+    private void copyFilesToTestDir() throws IOException
+    {
+        Path src = new File(RESOURCE_DIR).toPath();
+        Path dist = this.testDir.toPath();
+
+        if (!Files.exists(dist))
+        {
+            Files.createDirectory(dist);
+        }
+
+        Files.walk(src).forEach(path -> {
+            if (path.getNameCount() > src.getNameCount())
+            {
+                String relativePath = IntInterval.fromTo(src.getNameCount(), path.getNameCount() - 1)
+                        .collect(count -> path.getName(count).toString())
+                        .makeString("/");
+                Path target = dist.resolve(Paths.get(relativePath));
+                try
+                {
+                    Files.copy(path, target);
+                }
+                catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 }

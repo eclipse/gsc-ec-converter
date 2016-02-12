@@ -21,25 +21,18 @@ import java.util.stream.Collectors;
 
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.map.ImmutableMap;
-import org.eclipse.collections.api.map.MutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 
 public class Converter
 {
-    private static ImmutableList<String> FILE_SCOPE = Lists.immutable.of(".java", ".xml", "gradle");
-    private static ImmutableMap<String, String> CONVERSION_MAP;
+    private static final ImmutableList<String> FILE_SCOPE = Lists.immutable.of(".java", ".xml", "gradle");
+    private static final ImmutableMap<String, String> CONVERSION_MAP = Maps.immutable.with(
+            "com\\.gs", "org\\.eclipse",
+            "com\\.goldmansachs", "org\\.eclipse\\.collections",
+            "gs-collections", "eclipse-collections");
 
-    static
-    {
-        MutableMap<String, String> conversionMap = Maps.mutable.empty();
-        conversionMap.put("com\\.gs", "org\\.eclipse");
-        conversionMap.put("com\\.goldmansachs", "org\\.eclipse\\.collections");
-        conversionMap.put("gs-collections", "eclipse-collections");
-        CONVERSION_MAP = Maps.immutable.ofMap(conversionMap);
-    }
-
-    public static void main(String[] args)
+    public static void main(String... args)
     {
         if (args.length != 1)
         {
@@ -50,7 +43,7 @@ public class Converter
         if (Files.exists(Paths.get(path)))
         {
             System.out.println("Running Eclipse Collections Converter against " + path + ".");
-            convert(path);
+            Converter.convert(path);
             System.out.println("Done!");
         }
         else
@@ -66,18 +59,18 @@ public class Converter
         {
             Files.walk(Paths.get(path))
                     .filter(Files::isRegularFile)
-                    .filter(file -> FILE_SCOPE.anySatisfy(suffix ->  file.getFileName().toString().endsWith(suffix)))
+                    .filter(file -> FILE_SCOPE.anySatisfy(suffix -> file.getFileName().toString().endsWith(suffix)))
                     .forEach(file -> {
                         try
                         {
-                            final boolean[] fileChanged = {false};
+                            boolean[] fileChanged = {false};
                             List<String> replacedLines = Files.lines(file, Charset.defaultCharset()).map(line -> {
-                                String newLine = replaceMatching(line);
+                                String newLine = Converter.replaceMatching(line);
                                 fileChanged[0] = fileChanged[0] || !newLine.equals(line);
                                 return newLine;
                             }).collect(Collectors.toList());
 
-                            if(fileChanged[0])
+                            if (fileChanged[0])
                             {
                                 Files.write(file, replacedLines);
                             }
@@ -94,11 +87,11 @@ public class Converter
         }
     }
 
-    protected static String replaceMatching(final String original)
+    protected static String replaceMatching(String original)
     {
-        String[] temp = new String[]{original};
+        String[] temp = {original};
         CONVERSION_MAP.forEachKeyValue((key, value) -> {
-            final Pattern pattern = Pattern.compile(key);
+            Pattern pattern = Pattern.compile(key);
             Matcher matcher = pattern.matcher(temp[0]);
             temp[0] = matcher.replaceAll(value);
         });
