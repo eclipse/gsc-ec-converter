@@ -26,7 +26,7 @@ dependencies {
   compile 'org.eclipse.collections:eclipse-collections-api:7.0.0'
   compile 'org.eclipse.collections:eclipse-collections:7.0.0'
   testCompile 'org.eclipse.collections:eclipse-collections-testutils:7.0.0'
-  compile 'junit:junit:4.12'
+  testCompile 'junit:junit:4.12'
 }
 
 mainClassName = "org.eclipse.collections.tools.Converter"
