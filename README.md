@@ -29,20 +29,18 @@ If your project depends on GS Collections 6.2 or earlier, update your project to
 2. Run the converter against your project
 -----------------------------------------
 
-*NOTE*: The converter binary hasn't been released yet. In the meantime, you can build the converter from source code.
+Download [gsc-ec-converter-7.1.0.zip](https://www.eclipse.org/downloads/download.php?file=/collections/gsc-ec-converter-7.1.0.zip) and extract it.
 
-Clone this repo, or download the [master zip file](https://github.com/eclipse/gsc-ec-converter/archive/master.zip) and extract it.
-
-Run the command below under the directory where you cloned the repository or extracted the zip.
+Run the command below under the directory where you extracted the zip.
 
 #### Windows
 ```bash
-gradlew.bat run -Pargs="/path/to/your/project"
+bin/gsc-ec-converter.bat /path/to/your/project
 ```
 
 #### Mac/Linux/Unix
 ```bash
-./gradlew run -Pargs="/path/to/your/project"
+bin/gsc-ec-converter /path/to/your/project
 ```
 
 That's it.
