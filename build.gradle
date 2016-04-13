@@ -9,7 +9,7 @@
  */
 
 group 'org.eclipse.collections'
-version '7.1.0'
+version '7.1.1-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'application'
