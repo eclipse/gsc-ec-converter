@@ -26,7 +26,7 @@ import org.eclipse.collections.impl.factory.Maps;
 
 public class Converter
 {
-    private static final ImmutableList<String> FILE_SCOPE = Lists.immutable.of(".java", ".xml", "gradle", ".groovy");
+    private static final ImmutableList<String> FILE_SCOPE = Lists.immutable.of(".java", ".xml", "gradle", ".groovy", ".scala", ".kt", ".rb", ".clj");
     private static final ImmutableMap<String, String> CONVERSION_MAP = Maps.immutable.with(
             "com\\.gs", "org\\.eclipse",
             "com\\.goldmansachs", "org\\.eclipse\\.collections",
