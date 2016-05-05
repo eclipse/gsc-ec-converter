@@ -28,7 +28,7 @@ public class Converter
 {
     private static final ImmutableList<String> FILE_SCOPE = Lists.immutable.of(".java", ".xml", "gradle", ".groovy", ".scala", ".kt", ".rb", ".clj");
     private static final ImmutableMap<String, String> CONVERSION_MAP = Maps.immutable.with(
-            "com\\.gs", "org\\.eclipse",
+            "com\\.gs\\.collections", "org\\.eclipse\\.collections",
             "com\\.goldmansachs", "org\\.eclipse\\.collections",
             "gs-collections", "eclipse-collections");
 
