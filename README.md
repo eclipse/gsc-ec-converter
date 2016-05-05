@@ -16,7 +16,7 @@ File Scope
 
 The converter application runs on a directory and recursively scans for the following file types alters them in place.
 
- * .java
+ * .java, .groovy, .scala, .kt, .rb, .clj
  * .xml (Ant, Ivy, Maven)
  * .gradle (Gradle)
 
