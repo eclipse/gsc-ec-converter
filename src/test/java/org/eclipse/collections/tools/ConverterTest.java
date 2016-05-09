@@ -78,12 +78,26 @@ public class ConverterTest
     }
 
     @Test
-    public void invalidArg()
+    public void invalidArg1()
     {
         try
         {
             Converter.main();
             Assert.fail("Converter should fail for 0 argument");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals(1, ExitMock.getInstance().getStatus());
+        }
+    }
+
+    @Test
+    public void invalidArg2()
+    {
+        try
+        {
+            Converter.main(this.testDir.getAbsolutePath(), "nonExistingEncoding");
+            Assert.fail("Converter should fail for non existing encoding");
         }
         catch (RuntimeException e)
         {
