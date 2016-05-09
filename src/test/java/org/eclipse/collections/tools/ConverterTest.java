@@ -64,7 +64,7 @@ public class ConverterTest
         Assert.assertEquals(3, pomFile.countWith(String::contains, "eclipse-collections"));
 
         MutableList<String> javaFile = ListAdapter.adapt(Files.readAllLines(Paths.get(this.testDir + "/src/main/java/TestClass.java")));
-        Assert.assertEquals(0, javaFile.countWith(String::contains, "com.gs"));
+        Assert.assertEquals(1, javaFile.countWith(String::contains, "com.gs"));
         Assert.assertEquals(2, javaFile.countWith(String::contains, "org.eclipse"));
 
         MutableList<String> ignoredFile = ListAdapter.adapt(Files.readAllLines(Paths.get(this.testDir + "/.ignored/should_not_be_read")));
@@ -78,12 +78,26 @@ public class ConverterTest
     }
 
     @Test
-    public void invalidArg()
+    public void invalidArg1()
     {
         try
         {
             Converter.main();
             Assert.fail("Converter should fail for 0 argument");
+        }
+        catch (RuntimeException e)
+        {
+            Assert.assertEquals(1, ExitMock.getInstance().getStatus());
+        }
+    }
+
+    @Test
+    public void invalidArg2()
+    {
+        try
+        {
+            Converter.main(this.testDir.getAbsolutePath(), "nonExistingEncoding");
+            Assert.fail("Converter should fail for non existing encoding");
         }
         catch (RuntimeException e)
         {

@@ -1,5 +1,6 @@
 import com.gs.collections.api.list.MutableList;
 import com.gs.collections.impl.factory.Lists;
+import com.gs.somepackage.api.SomeApi;
 
 public class TestClass
 {

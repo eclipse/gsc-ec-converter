@@ -12,6 +12,8 @@ package org.eclipse.collections.tools;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -28,20 +30,34 @@ public class Converter
 {
     private static final ImmutableList<String> FILE_SCOPE = Lists.immutable.of(".java", ".xml", "gradle", ".groovy", ".scala", ".kt", ".rb", ".clj");
     private static final ImmutableMap<String, String> CONVERSION_MAP = Maps.immutable.with(
-            "com\\.gs", "org\\.eclipse",
+            "com\\.gs\\.collections", "org\\.eclipse\\.collections",
             "com\\.goldmansachs", "org\\.eclipse\\.collections",
             "gs-collections", "eclipse-collections");
+    public static final Charset DEFAULT_ENCODING = Charset.forName("UTF-8");
+    private static Charset endoding = DEFAULT_ENCODING;
 
     public static void main(String... args)
     {
-        if (args.length != 1)
+        if (args.length < 1)
         {
-            System.out.println("Usage: gsc-ec-converter <PATH_TO_PROJECT>");
+            System.out.println("Usage: gsc-ec-converter <PATH_TO_PROJECT> [File encoding]");
             System.exit(1);
         }
         String path = args[0];
         if (Files.exists(Paths.get(path)))
         {
+            if (args.length == 2)
+            {
+                try
+                {
+                    endoding = Charset.forName(args[1]);
+                }
+                catch (IllegalCharsetNameException | UnsupportedCharsetException e)
+                {
+                    System.out.println("Invalid file encoding is passed: " + args[1]);
+                    System.exit(1);
+                }
+            }
             System.out.println("Running Eclipse Collections Converter against " + path + ".");
             Converter.convert(path);
             System.out.println("Done!");
@@ -64,7 +80,7 @@ public class Converter
                         try
                         {
                             boolean[] fileChanged = {false};
-                            List<String> replacedLines = Files.lines(file, Charset.defaultCharset()).map(line -> {
+                            List<String> replacedLines = Files.lines(file, endoding).map(line -> {
                                 String newLine = Converter.replaceMatching(line);
                                 fileChanged[0] = fileChanged[0] || !newLine.equals(line);
                                 return newLine;
