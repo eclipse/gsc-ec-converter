@@ -19,6 +19,7 @@ The converter application runs on a directory and recursively scans for the foll
  * .java, .groovy, .scala, .kt, .rb, .clj
  * .xml (Ant, Ivy, Maven)
  * .gradle (Gradle)
+ * .iml (IntelliJ)
 
 1. Update GS Collections to 7.0
 -------------------------------
